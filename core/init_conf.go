@@ -1,33 +1,29 @@
+// 读取配置：1.读取命令行参数并绑定；2.读取yaml配置文件相关配置
+// core/init_conf.go
 package core
 
 import (
+	"blogx_backend/conf"
+	"blogx_backend/flags"
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"os"
 )
 
-var confPath = "settings.yaml"
-
-type System struct {
-	IP   string `yaml:"ip"`
-	Port string `yaml:"port"`
-}
-
-type Config struct {
-	System System `yaml:"system"`
-}
-
-func ReadConf() {
-	byteData, err := os.ReadFile(confPath)
+func ReadConf() (c *conf.Config) {
+	byteData, err := os.ReadFile(flags.FlagOptions.File)
 	if err != nil {
 		panic(err)
 	}
 
-	var conf Config
-	err = yaml.Unmarshal(byteData, &conf)
+	c = new(conf.Config)
+	err = yaml.Unmarshal(byteData, c)
 	if err != nil {
 		panic(fmt.Sprintf("ymal file format error: %s", err))
 	}
 
-	fmt.Println(conf)
+	fmt.Printf("读取配置文件 %s 成功\n", flags.FlagOptions.File)
+	fmt.Println(*c)
+
+	return c
 }
